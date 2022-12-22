@@ -10,8 +10,8 @@ import (
 
 func Test_render(t *testing.T) {
 	type args struct {
-		classes []class
-		refs    []reference
+		classes []*class
+		refs    []*reference
 	}
 	tests := []struct {
 		name    string
@@ -21,7 +21,7 @@ func Test_render(t *testing.T) {
 	}{
 		{
 			args: args{
-				classes: []class{
+				classes: []*class{
 					{
 						Name: "Animal",
 						Members: []member{
@@ -49,14 +49,10 @@ func Test_render(t *testing.T) {
 						},
 					},
 				},
-				refs: []reference{
+				refs: []*reference{
 					{
-						From: class{
-							Name: "Pet",
-						},
-						To: class{
-							Name: "Animal",
-						},
+						From: "Pet",
+						To:   "Animal",
 					},
 				},
 			},

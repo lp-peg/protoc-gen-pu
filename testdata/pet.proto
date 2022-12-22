@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+message Pet {
+  string name   = 1;
+  int32  age    = 2;
+  Animal animal = 3;
+}
+
+message Animal {
+  string name     = 1;
+  int32  category = 2;
+}

@@ -13,6 +13,6 @@ type member struct {
 }
 
 type reference struct {
-	From class
-	To   class
+	From string
+	To   string
 }
