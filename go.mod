@@ -1,4 +1,4 @@
-module github.com/lp-peg/protoc-gen-erd
+module github.com/lp-peg/protoc-gen-pu
 
 go 1.19
 
