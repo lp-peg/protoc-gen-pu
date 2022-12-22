@@ -72,6 +72,7 @@ func Test_render(t *testing.T) {
 			want: []byte(`
 @startuml
 
+hide circle
 skinparam linetype ortho
 
 entity Animal {
