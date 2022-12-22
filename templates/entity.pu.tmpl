@@ -1,0 +1,5 @@
+entity {{ .Name }} {
+  {{- range .Members }}
+  {{ .Name }} ({{ .Type }})
+  {{- end }}
+}

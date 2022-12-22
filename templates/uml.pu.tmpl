@@ -1,0 +1,13 @@
+@startuml
+
+skinparam linetype ortho
+
+{{ range .Classes -}}
+  {{ template "entity" . }}
+{{ end }}
+
+{{- range .References -}}
+  {{ template "references" . }}
+{{- end }}
+
+@enduml
