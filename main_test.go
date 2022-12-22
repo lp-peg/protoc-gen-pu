@@ -48,11 +48,24 @@ func Test_render(t *testing.T) {
 							},
 						},
 					},
+					{
+						Name: "Owner",
+						Members: []member{
+							{
+								Name: "name",
+								Type: "string",
+							},
+						},
+					},
 				},
 				refs: []*reference{
 					{
 						From: "Pet",
 						To:   "Animal",
+					},
+					{
+						From: "Pet",
+						To:   "Owner",
 					},
 				},
 			},
@@ -71,7 +84,12 @@ entity Pet {
   age (int64)
 }
 
+entity Owner {
+  name (string)
+}
+
 Animal <-- Pet
+Owner <-- Pet
 
 @enduml
 `),

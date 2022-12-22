@@ -1,12 +1,18 @@
 syntax = "proto3";
 
 message Pet {
+  message Animal {
+    enum AnimalCategory {
+      UNSPECIFIED = 0;
+      DOG         = 1;
+      CAT         = 2;
+      COW         = 3;
+      BEAR        = 4;
+    }
+    string         name     = 1;
+    AnimalCategory category = 2;
+  }
   string name   = 1;
   int32  age    = 2;
   Animal animal = 3;
-}
-
-message Animal {
-  string name     = 1;
-  int32  category = 2;
 }

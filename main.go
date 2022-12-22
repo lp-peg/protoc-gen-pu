@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	_ "embed"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -92,6 +93,9 @@ func run(in *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorResponse, er
 			classes = append(classes, c...)
 			refs = append(refs, r...)
 		}
+		for _, enum := range file.GetEnumType() {
+			classes = append(classes, parseEnum(enum)...)
+		}
 	}
 	out, err := render(classes, refs)
 	if err != nil {
@@ -115,14 +119,15 @@ func parseMessage(message *descriptorpb.DescriptorProto) ([]*class, []*reference
 	resRefs := make([]*reference, 0)
 	for _, field := range message.GetField() {
 		switch field.GetType() {
-		case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE:
+		case descriptorpb.FieldDescriptorProto_TYPE_MESSAGE, descriptorpb.FieldDescriptorProto_TYPE_ENUM:
+			typename := ss(strings.Split(field.GetTypeName(), ".")).tail()
 			c.Members = append(c.Members, member{
 				Name: field.GetName(),
-				Type: "<FK>",
+				Type: typename + "<FK>",
 			})
 			resRefs = append(resRefs, &reference{
 				From: c.Name,
-				To:   ss(strings.Split(field.GetTypeName(), ".")).tail(),
+				To:   typename,
 			})
 		default:
 			c.Members = append(c.Members, member{
@@ -136,5 +141,21 @@ func parseMessage(message *descriptorpb.DescriptorProto) ([]*class, []*reference
 		resClasses = append(resClasses, nestedClasses...)
 		resRefs = append(resRefs, nestedRefs...)
 	}
+	for _, nestedEnum := range message.GetEnumType() {
+		resClasses = append(resClasses, parseEnum(nestedEnum)...)
+	}
 	return resClasses, resRefs
+}
+
+func parseEnum(enum *descriptorpb.EnumDescriptorProto) []*class {
+	c := class{
+		Name: enum.GetName(),
+	}
+	for _, e := range enum.GetValue() {
+		c.Members = append(c.Members, member{
+			Name: e.GetName(),
+			Type: fmt.Sprintf("ENUM: %v", e.GetNumber()),
+		})
+	}
+	return []*class{&c}
 }
