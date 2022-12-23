@@ -1,12 +1,12 @@
 @startuml
 
-hide circle
-skinparam linetype ortho
-
+{{ if not .ShowCircle -}} hide circle {{- end }}
+{{ range .Skinparams -}}
+  {{ template "skinparam" . }}
+{{ end }}
 {{ range .Classes -}}
   {{ template "entity" . }}
 {{ end }}
-
 {{- range .References -}}
   {{ template "references" . }}
 {{ end }}

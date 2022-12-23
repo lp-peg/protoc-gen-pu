@@ -22,6 +22,8 @@ var (
 	entityTmpl []byte
 	//go:embed templates/reference.pu.tmpl
 	referenceTmpl []byte
+	//go:embed templates/skinparam.pu.tmpl
+	skinparamTmpl []byte
 )
 
 func str(s string) *string {
@@ -62,14 +64,17 @@ func main() {
 	}
 }
 
-func render(classes []*class, refs []*reference) ([]byte, error) {
+func render(classes []*class, refs []*reference, skinparams []*skinparam, showCircle bool) ([]byte, error) {
 	tmpl := template.Must(template.New("uml").Parse(string(umlTmpl)))
 	tmpl = template.Must(tmpl.AddParseTree("entity", template.Must(template.New("entity").Parse(string(entityTmpl))).Tree))
 	tmpl = template.Must(tmpl.AddParseTree("references", template.Must(template.New("references").Parse(string(referenceTmpl))).Tree))
+	tmpl = template.Must(tmpl.AddParseTree("skinparam", template.Must(template.New("skinparam").Parse(string(skinparamTmpl))).Tree))
 	buf := new(bytes.Buffer)
 	err := tmpl.ExecuteTemplate(buf, "uml", map[string]interface{}{
 		"Classes":    classes,
 		"References": refs,
+		"Skinparams": skinparams,
+		"ShowCircle": showCircle,
 	})
 	if err != nil {
 		return nil, err
@@ -97,14 +102,15 @@ func run(in *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorResponse, er
 			classes = append(classes, parseEnum(enum)...)
 		}
 	}
-	out, err := render(classes, refs)
+	opt := option(*in)
+	out, err := render(classes, refs, opt.getSkinparams(), opt.getCircleShow())
 	if err != nil {
 		return nil, err
 	}
 	return &pluginpb.CodeGeneratorResponse{
 		File: []*pluginpb.CodeGeneratorResponse_File{
 			{
-				Name:    str("out.pu"),
+				Name:    str((*option)(in).getOutputPath()),
 				Content: str(string(out)),
 			},
 		},

@@ -10,8 +10,10 @@ import (
 
 func Test_render(t *testing.T) {
 	type args struct {
-		classes []*class
-		refs    []*reference
+		classes    []*class
+		refs       []*reference
+		skinparam  []*skinparam
+		showCircle bool
 	}
 	tests := []struct {
 		name    string
@@ -68,12 +70,24 @@ func Test_render(t *testing.T) {
 						To:   "Owner",
 					},
 				},
+				skinparam: []*skinparam{
+					{
+						Param: "linetype",
+						Value: "ortho",
+					},
+					{
+						Param: "classFontSize",
+						Value: "10",
+					},
+				},
+				showCircle: false,
 			},
 			want: []byte(`
 @startuml
 
 hide circle
 skinparam linetype ortho
+skinparam classFontSize 10
 
 entity Animal {
   name (string)
@@ -98,7 +112,7 @@ Owner <-- Pet
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := render(tt.args.classes, tt.args.refs)
+			got, err := render(tt.args.classes, tt.args.refs, tt.args.skinparam, tt.args.showCircle)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("render() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -107,6 +121,34 @@ Owner <-- Pet
 			tt.want = bytes.TrimRight(tt.want, "\n")
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Error(diff)
+			}
+		})
+	}
+}
+
+func Test_option_getParam(t *testing.T) {
+	type args struct {
+		param string
+	}
+	tests := []struct {
+		name string
+		o    option
+		args args
+		want []string
+	}{
+		{
+			o: option{
+				Parameter: str("out=foo.pu"),
+			},
+			args: args{param: "out"},
+			want: []string{"foo.pu"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.o.getParam(tt.args.param)
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Errorf("option.getParam() = %v, want %v", got, tt.want)
 			}
 		})
 	}
