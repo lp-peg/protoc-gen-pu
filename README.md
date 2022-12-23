@@ -1,6 +1,6 @@
 # protoc-gen-pu
 
-protoc plugin to generate [plant UML](https://plantuml.com/) class diagram.
+protoc plugin to generate a [plant UML](https://plantuml.com/) class diagram.
 
 ## prerequisites
 - go ~> v1.19
@@ -10,7 +10,7 @@ protoc plugin to generate [plant UML](https://plantuml.com/) class diagram.
 ## install
 
 ```sh
-go install github.com/lp-peg/protoc-gen-pu
+go install github.com/lp-peg/protoc-gen-pu@latest
 ```
 
 ## usage
